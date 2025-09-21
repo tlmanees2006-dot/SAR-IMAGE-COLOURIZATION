@@ -5,7 +5,7 @@ from torchvision.utils import save_image
 from PIL import Image
 import os
 
-# Define the diffusion model architecture (EXACTLY as you provided)
+
 class DiffusionModel(nn.Module):
     def __init__(self):
         super(DiffusionModel, self).__init__()
@@ -38,7 +38,7 @@ class DiffusionModel(nn.Module):
         decoded = self.decoder(bottleneck)
         return decoded
 
-# Function to get all image paths in a directory (EXACTLY as you provided)
+
 def get_image_paths(root_dir):
     image_paths = []
     for root, _, files in os.walk(root_dir):
@@ -47,37 +47,36 @@ def get_image_paths(root_dir):
                 image_paths.append(os.path.join(root, file))
     return image_paths
 
-# Load the trained model
+# Load model
 model = DiffusionModel()
-model.load_state_dict(torch.load(r"/content/drive/MyDrive/Colab Notebooks/sar_colorization_model.pth"))
-model.eval()  # Set the model to evaluation mode
+model.load_state_dict(torch.load(r"    "))#PATH TO MODEL
+model.eval()  
 
-# Set device (use CPU if CUDA is not available)
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
-# Function to load grayscale images for testing (EXACTLY as you provided)
+
 def load_grayscale_images(test_dir):
     image_paths = [os.path.join(test_dir, file) for file in os.listdir(test_dir) if file.endswith(".jpg") or file.endswith(".png")]
     transform = transforms.Compose([transforms.ToTensor()])
     images = [transform(Image.open(img_path).convert('L')).unsqueeze(0) for img_path in image_paths]  # Convert to 4D tensor (batch size 1)
     return images, image_paths
 
-# Directory containing test grayscale images
-test_grayscale_dir = r"/content/drive/MyDrive/CIFAR-10/bw"
+test_grayscale_dir = r"   "#PATH TO DIRECTORY(SAR IMAGES)
 
-# Load the test images
+
 test_images, image_paths = load_grayscale_images(test_grayscale_dir)
 
-# Run inference and save the colorized images
-output_dir = r"/content/drive/MyDrive/CIFAR-10/colorized_output"
+
+output_dir = r"   "# PATH TO DIRECTORY(SAVE COLOURISED IMAGES)
 os.makedirs(output_dir, exist_ok=True)
 
 with torch.no_grad():
     for img_tensor, img_path in zip(test_images, image_paths):
         img_tensor = img_tensor.to(device)
         output = model(img_tensor)
-        output = output.squeeze(0)  # Remove batch dimension
+        output = output.squeeze(0) 
         output_image_path = os.path.join(output_dir, os.path.basename(img_path))
         save_image(output, output_image_path)
         print(f"Colorized image saved to {output_image_path}")
